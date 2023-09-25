@@ -1,0 +1,215 @@
+---
+title: "Transformers"
+author: "Ítallo Silva"
+format: 
+  revealjs:
+    auto-play-media: true
+---
+
+# Recapitulando
+
+## Arquitetura sequence-to-sequence
+
+Um modelo seq2seq recebe uma sequência de itens (palavras, letras, etc) e gera como saída outra sequência de itens.
+
+::: {.fragment}
+<video src="media/seq2seq_1.mp4" loop/>
+:::
+
+## Arquitetura sequence-to-sequence
+
+Podemos desmembrar um modelo seq2seq em duas partes: **enconder** e **decoder**.
+
+::: {.fragment}
+O <span style="color:#F39019;">contexto</span> é um vetor que compila a informação da sequência de entrada.
+:::
+
+<video src="media/seq2seq_3.mp4" loop/>
+
+## Arquitetura sequence-to-sequence
+
+Tipicamente esses modelos são implementados utilizando Redes Neurais Recorrentes.
+
+::: {.fragment}
+<video src="media/seq2seq_6.mp4" loop/>
+:::
+
+## Arquitetura sequence-to-sequence
+
+::: {.incremental}
+
+- Entretanto, esse tipo de implementação tem um gargalo: **toda a informação da sequência de entrada fica comprimida na última camada**.
+
+- Isso tornou difícil para estes modelos lidarem com longas sequências, pois o real contexto das palavras se perdia.
+
+- Para mitigar isso foi proposta uma solução: **Attention**.
+
+:::
+
+## Seq2Seq com Attention
+
+Ao invés de passar a última camada (<span style="color:#F39019;">hidden state</span>) como contexto, o encoder 'passa' todas as camadas para o decoder.
+
+<video src="media/seq2seq_7.mp4" loop/>
+
+## Seq2Seq com Attention {.smaller}
+
+Por sua vez, o decoder realiza um passo extra antes de gerar sua saída. Para conseguir focar nas partes da entrada que são relevantes no momento atual, o decoder faz o seguinte:
+
+::: {.incremental}
+
+- Calcula um peso para cada <span style="color:#F39019;">hidden state</span> que recebeu do enconder;
+- Aplica a função softmax para transformar os pesos numa distribuição de probabilidade;
+- Realiza uma soma ponderada entre cada <span style="color:#F39019;">hidden state</span> e seu peso transformado;
+- Concatena o <span style="color:#B36AE2;">hidden state</span> atual com o novo vetor de contexto.
+
+:::
+
+## Seq2Seq com Attention
+
+<video src="media/attention_process.mp4"/>
+
+# O problema das redes recorrentes
+
+## O problema das redes recorrentes
+Apesar de terem obtidos bons resultados, as redes recorrentes sofrem de dois problemas:
+
+::: columns
+::: {.column width="45%"}
+::: fragment
+::: {style="text-align: center"}
+*Dificuldade de paralelização*
+
+![](media/parallelization.png)
+
+:::
+:::
+:::
+
+::: {.column width="45%"}
+::: fragment
+::: {style="text-align: center"}
+*Distância de interação linear*
+
+![](media/distance.png)
+:::
+:::
+:::
+
+:::
+
+# Attention is All You Need
+
+## Surgem os transformers
+
+Para tentar resolver os problemas anteriores, um novo modelo foi proposto em um artigo chamado *Attention is All You Need*: os **Transformers**.
+
+::: fragment
+
+![](media/optimus_prime.png){fig-align="right"}
+
+:::
+
+## Vamos entender melhor esses modelos
+
+![](https://jalammar.github.io/images/t/the_transformer_3.png){fig-align="center"}
+
+## Vamos entender melhor esses modelos
+
+![](https://jalammar.github.io/images/t/The_transformer_encoders_decoders.png){fig-align="center"}
+
+## Vamos entender melhor esses modelos
+
+![](https://jalammar.github.io/images/t/The_transformer_encoder_decoder_stack.png){fig-align="center"}
+
+## Vamos entender melhor esses modelos
+
+![](https://jalammar.github.io/images/t/Transformer_decoder.png){fig-align="center"}
+
+## Focando no enconder
+
+![](https://jalammar.github.io/images/t/encoder_with_tensors_2.png){fig-align="center"}
+
+## Self-attention {.smaller}
+
+Podemos imaginar attention como sendo uma tabela de consulta (dicionário) com um acesso um pouco diferente do convencional.
+
+::: columns
+::: {.column width="45%"}
+::: fragment
+::: {style="text-align: center"}
+*Tabela de consulta tradicional*
+
+![](media/lookup_simple.png)
+
+:::
+:::
+:::
+
+::: {.column width="45%"}
+::: fragment
+::: {style="text-align: center"}
+*Attention*
+
+![](media/lookup_attention.png)
+
+:::
+
+::: fragment
+A consulta dá *match* com todas as chaves, de acordo com pesos entre 0 e 1. Os valores são então multiplicados pelos pesos e somados.
+:::
+
+:::
+:::
+
+:::
+
+
+## Self-attention {.smaller}
+
+A camada de self-attention irá criar uma representação contextual para cada palavra da entrada.
+
+::: columns
+::: {.column width="45%"}
+
+![](media/self_attention.png){fig-align="center"}
+
+:::
+
+::: {.column width="45%"}
+::: {.incremental}
+
+- O número de operações impossíveis de paralelizar não cresce com o tamanho da entrada.
+- Distância de interação máxima: O(1), dado que todas as palavras interagem em todas as camadas.
+
+:::
+:::
+
+:::
+
+
+## Como calcular?
+
+Vamos precisar de algumas matrizes $W^Q$, $W^K$ e $W^V$. Essas matrizes iram gerar três representações para cada palavra: chave (key), valor (value) e consulta (query).
+
+![](https://jalammar.github.io/images/t/transformer_self_attention_vectors.png){fig-align="center"}
+
+## Como calcular? {.smaller}
+
+A camada de self-attention irá criar uma representação contextual para cada palavra da entrada.
+
+![](https://jalammar.github.io/images/t/self-attention-output.png){fig-align="center"}
+
+## Multi-head self-attention
+
+## Multi-head self-attention
+
+![](https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png)
+
+## Codificando a posição
+
+## Conexões residuais
+
+## Camada de normalização
+
+## E o decodificador?
