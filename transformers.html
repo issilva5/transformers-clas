@@ -511,38 +511,88 @@
 <p>A camada de self-attention irá criar uma representação contextual para cada palavra da entrada.</p>
 
 <img data-src="https://jalammar.github.io/images/t/self-attention-output.png" class="r-stretch quarto-figure-center"></section>
-<section id="multi-head-self-attention" class="slide level2">
-<h2>Multi-head self-attention</h2>
-</section>
-<section id="multi-head-self-attention-1" class="slide level2">
-<h2>Multi-head self-attention</h2>
-
-<img data-src="https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png" class="r-stretch"></section></section>
+<section id="matematicamente" class="slide level2 smaller">
+<h2>Matematicamente…</h2>
+<p>Considere <span class="math inline">\(w_{1:n}\)</span> como uma sequência de palavras em um vocabulário <span class="math inline">\(V\)</span>, por exemplo, <em>Aqui jaz Dobby, um elfo livre</em>. Para cada <span class="math inline">\(w_i\)</span>:</p>
+<div>
+<ol type="1">
+<li class="fragment">Seja <span class="math inline">\(x_i = Ew_i\)</span>, onde <span class="math inline">\(E \in \mathbb{R}^{d\times|V|}\)</span> é uma matriz de embeddings.</li>
+<li class="fragment">Transforme cada <em>word embedding</em> com as matrizes <span class="math inline">\(W^Q, W^K, W^V \in \mathbb{R}^{d\times d}\)</span>. <span class="math display">\[q_i = W^Qx_i \textrm{ (consultas)} \qquad k_i = W^Kx_i \textrm{ (chaves)} \qquad v_i = W^Vx_i \textrm{ (valores)}\]</span></li>
+<li class="fragment">Calcule os scores entre consultas e chaves e normalize com softmax: <span class="math display">\[e_{ij} = \frac{q_i^Tk_j}{\sqrt{d}} \qquad\qquad \alpha_{ij} = \frac{exp(e_{ij})}{\sum_{j'=1}^n exp(e_{ij'})}\]</span></li>
+<li class="fragment">Calcule o valor de saída: <span class="math display">\[z_{i} = \sum_{j=1}^n \alpha_{ij}v_j\]</span></li>
+</ol>
+</div>
+</section></section>
 <section>
 <section id="algumas-melhorias" class="title-slide slide level1 center">
 <h1>Algumas melhorias</h1>
 
 </section>
-<section id="codificando-a-posição" class="slide level2">
+<section id="codificando-a-posição" class="slide level2 smaller">
 <h2>Codificando a posição</h2>
+<p>Na forma atual como construímos nossa camada de attention, a ordem das palavras no documento não importa. Por exemplo, considere as seguintes frases:</p>
+<ul>
+<li>Só João alugou a casa de praia;</li>
+<li>João só alugou a casa de praia;</li>
+<li>João alugou só a casa de praia.</li>
+</ul>
+<div class="fragment">
+<p>A palavra <strong>só</strong> tem diferentes significados que dependem da sua posição. Com as fórmulas que definimos como ficariam os pesos <span class="math inline">\(\alpha_{só,João}\)</span> em cada frase?</p>
+</div>
 </section>
-<section id="conexões-residuais" class="slide level2">
-<h2>Conexões residuais</h2>
+<section id="codificando-a-posição-1" class="slide level2">
+<h2>Codificando a posição</h2>
+<div>
+<ul>
+<li class="fragment"><p>Ou seja, não existe depedência de posição na operação de <em>self-attetion</em>.</p></li>
+<li class="fragment"><p>Porém, sabemos que a posição das palavras é importante para o sentido da frase, assim precisamos de uma maneira de inserir essa posição no cálculo.</p></li>
+<li class="fragment"><p>Uma forma simples de fazer isso é considerar uma matriz <span class="math inline">\(P \in \mathbb{R}^{N\times d}\)</span>, em que N é o tamanho máximo da sentença que iremos considerar no modelo. E então mudar nosso <span class="math inline">\(x_i\)</span> por <span class="math inline">\(\tilde{x_i} = x_i + p_i\)</span>.</p></li>
+</ul>
+</div>
 </section>
-<section id="camada-de-normalização" class="slide level2">
-<h2>Camada de normalização</h2>
+<section id="multi-head-self-attention" class="slide level2 smaller">
+<h2>Multi-head self-attention</h2>
+<p>Outro refinamento que pode ser aplicado à <em>self-attention</em>, é o que chamamos de <em>Multi-head self-attention</em>.</p>
+<div class="fragment">
+<p><img data-src="https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png"></p>
+</div>
 </section></section>
 <section>
 <section id="retomando-nosso-modelo" class="title-slide slide level1 center">
 <h1>Retomando nosso modelo</h1>
 
-</section>
+<img data-src="https://jalammar.github.io/images/t/Transformer_decoder.png" class="r-stretch quarto-figure-center"></section>
 <section id="focando-no-enconder" class="slide level2">
 <h2>Focando no enconder</h2>
 
-<img data-src="https://jalammar.github.io/images/t/encoder_with_tensors_2.png" class="r-stretch quarto-figure-center"></section>
+<img data-src="https://jalammar.github.io/images/t/transformer_resideual_layer_norm.png" class="r-stretch quarto-figure-center"></section>
+<section id="focando-no-enconder-1" class="slide level2">
+<h2>Focando no enconder</h2>
+<div>
+<ul>
+<li class="fragment">Conexões residuais</li>
+<li class="fragment">Camada de normalização</li>
+</ul>
+</div>
+
+<img data-src="https://jalammar.github.io/images/t/transformer_resideual_layer_norm_2.png" class="r-stretch quarto-figure-center"></section>
 <section id="e-o-decodificador" class="slide level2">
 <h2>E o decodificador?</h2>
+
+<img data-src="https://jalammar.github.io/images/t/transformer_resideual_layer_norm_3.png" class="r-stretch quarto-figure-center"></section>
+<section id="e-o-decodificador-1" class="slide level2">
+<h2>E o decodificador?</h2>
+
+<img data-src="https://jalammar.github.io/images/t/transformer_decoding_1.gif" class="r-stretch"></section>
+<section id="e-o-decodificador-2" class="slide level2">
+<h2>E o decodificador?</h2>
+
+<img data-src="https://jalammar.github.io/images/t/transformer_decoding_2.gif" class="r-stretch"></section>
+<section id="referências" class="slide level2 smaller">
+<h2>Referências</h2>
+<p>Alammar, J. The Illustrated Transformer, Jay Alammar, accessado em 26 de setembro de 2023, <a href="https://jalammar.github.io/illustrated-transformer/" class="uri">https://jalammar.github.io/illustrated-transformer/</a>.</p>
+<p>Alammar, J. Visualizing A Neural Machine Translation Model, Jay Alammar, accessado em 26 de setembro de 2023, <a href="https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/" class="uri">https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/</a>.</p>
+<p>Hewitt, J. Note 10: Self-Attention &amp; Transformers, CS 224n: Natural Language Processing with Deep Learning, acessado em 26 de setembro de 2023, <a href="http://web.stanford.edu/class/cs224n/readings/cs224n-self-attention-transformers-2023_draft.pdf" class="uri">http://web.stanford.edu/class/cs224n/readings/cs224n-self-attention-transformers-2023_draft.pdf</a>.</p>
 <div class="footer footer-default">
 
 </div>

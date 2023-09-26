@@ -198,24 +198,94 @@ A camada de self-attention irá criar uma representação contextual para cada p
 
 ![](https://jalammar.github.io/images/t/self-attention-output.png){fig-align="center"}
 
-## Multi-head self-attention
+## Matematicamente... {.smaller}
 
-## Multi-head self-attention
+Considere $w_{1:n}$ como uma sequência de palavras em um vocabulário $V$, por exemplo, *Aqui jaz Dobby, um elfo livre*. Para cada $w_i$:
 
-![](https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png)
+::: {.incremental}
+
+1. Seja $x_i = Ew_i$, onde $E \in \mathbb{R}^{d\times|V|}$ é uma matriz de embeddings.
+2. Transforme cada *word embedding* com as matrizes $W^Q, W^K, W^V \in \mathbb{R}^{d\times d}$.
+$$q_i = W^Qx_i \textrm{ (consultas)} \qquad k_i = W^Kx_i \textrm{ (chaves)} \qquad v_i = W^Vx_i \textrm{ (valores)}$$
+3. Calcule os scores entre consultas e chaves e normalize com softmax:
+$$e_{ij} = \frac{q_i^Tk_j}{\sqrt{d}} \qquad\qquad \alpha_{ij} = \frac{exp(e_{ij})}{\sum_{j'=1}^n exp(e_{ij'})}$$
+5. Calcule o valor de saída:
+$$z_{i} = \sum_{j=1}^n \alpha_{ij}v_j$$
+
+:::
 
 # Algumas melhorias
 
+## Codificando a posição {.smaller}
+
+Na forma atual como construímos nossa camada de attention, a ordem das palavras no documento não importa. Por exemplo, considere as seguintes frases:
+
+- Só João alugou a casa de praia;
+- João só alugou a casa de praia;
+- João alugou só a casa de praia.
+
+::: {.fragment}
+
+A palavra **só** tem diferentes significados que dependem da sua posição. Com as fórmulas que definimos como ficariam os pesos $\alpha_{só,João}$ em cada frase?
+
+:::
+
 ## Codificando a posição
 
-## Conexões residuais
+::: {.incremental}
+- Ou seja, não existe depedência de posição na operação de *self-attetion*. 
 
-## Camada de normalização
+- Porém, sabemos que a posição das palavras é importante para o sentido da frase, assim precisamos de uma maneira de inserir essa posição no cálculo.
+
+- Uma forma simples de fazer isso é considerar uma matriz $P \in \mathbb{R}^{N\times d}$, em que N é o tamanho máximo da sentença que iremos considerar no modelo. E então mudar nosso $x_i$ por $\tilde{x_i} = x_i + p_i$.
+
+:::
+
+## Multi-head self-attention {.smaller}
+
+Outro refinamento que pode ser aplicado à *self-attention*, é o que chamamos de *Multi-head self-attention*.
+
+::: {.fragment}
+
+![](https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png)
+
+:::
 
 # Retomando nosso modelo
 
+![](https://jalammar.github.io/images/t/Transformer_decoder.png){fig-align="center"}
+
 ## Focando no enconder
 
-![](https://jalammar.github.io/images/t/encoder_with_tensors_2.png){fig-align="center"}
+![](https://jalammar.github.io/images/t/transformer_resideual_layer_norm.png){fig-align="center"}
+
+## Focando no enconder
+
+::: {.incremental}
+
+- Conexões residuais
+- Camada de normalização
+
+:::
+
+![](https://jalammar.github.io/images/t/transformer_resideual_layer_norm_2.png){fig-align="center"}
 
 ## E o decodificador?
+
+![](https://jalammar.github.io/images/t/transformer_resideual_layer_norm_3.png){fig-align="center"}
+
+## E o decodificador?
+
+![](https://jalammar.github.io/images/t/transformer_decoding_1.gif)
+
+## E o decodificador?
+
+![](https://jalammar.github.io/images/t/transformer_decoding_2.gif)
+
+## Referências {.smaller}
+
+Alammar, J. The Illustrated Transformer, Jay Alammar, accessado em 26 de setembro de 2023, <https://jalammar.github.io/illustrated-transformer/>.
+
+Alammar, J. Visualizing A Neural Machine Translation Model, Jay Alammar, accessado em 26 de setembro de 2023, <https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/>.
+
+Hewitt, J. Note 10: Self-Attention & Transformers, CS 224n: Natural Language Processing with Deep Learning, acessado em 26 de setembro de 2023, <http://web.stanford.edu/class/cs224n/readings/cs224n-self-attention-transformers-2023_draft.pdf>.
