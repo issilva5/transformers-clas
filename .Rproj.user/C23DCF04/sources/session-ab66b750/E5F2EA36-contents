@@ -126,9 +126,7 @@ Para tentar resolver os problemas anteriores, um novo modelo foi proposto em um 
 
 ![](https://jalammar.github.io/images/t/Transformer_decoder.png){fig-align="center"}
 
-## Focando no enconder
-
-![](https://jalammar.github.io/images/t/encoder_with_tensors_2.png){fig-align="center"}
+# Self-attetion
 
 ## Self-attention {.smaller}
 
@@ -206,10 +204,18 @@ A camada de self-attention irá criar uma representação contextual para cada p
 
 ![](https://jalammar.github.io/images/t/transformer_multi-headed_self-attention-recap.png)
 
+# Algumas melhorias
+
 ## Codificando a posição
 
 ## Conexões residuais
 
 ## Camada de normalização
+
+# Retomando nosso modelo
+
+## Focando no enconder
+
+![](https://jalammar.github.io/images/t/encoder_with_tensors_2.png){fig-align="center"}
 
 ## E o decodificador?
